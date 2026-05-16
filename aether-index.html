@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Aether — Ecosystem Runtime</title>
+<meta name="description" content="Aether is the web ecosystem runtime and application shell of the Rymory platform. The invisible medium that carries everything."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#050816;
+  --border:rgba(255,255,255,0.07);
+  --text:#edf3ff;
+  --muted:#8d9bb7;
+  --blue:#67a8ff;
+  --cyan:#6be3ff;
+  --purple:#a78bfa;
+  --glow:rgba(103,168,255,0.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',sans-serif;
+  background:
+    radial-gradient(circle at 20% 25%,rgba(103,168,255,0.09),transparent 35%),
+    radial-gradient(circle at 80% 75%,rgba(167,139,250,0.07),transparent 35%),
+    var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+  min-height:100vh;
+}
+body::before{
+  content:"";position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.014) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.014) 1px,transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;
+  mask-image:radial-gradient(circle at center,black 5%,transparent 75%);
+  z-index:0;
+}
+.container{width:min(1280px,92%);margin:auto;position:relative;z-index:1}
+
+/* NAV */
+.navbar{
+  position:fixed;top:0;left:0;width:100%;z-index:1000;
+  backdrop-filter:blur(20px);
+  background:rgba(5,8,22,0.55);
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.nav-inner{display:flex;justify-content:space-between;align-items:center;padding:18px 0}
+.logo{
+  font-family:'Syne',sans-serif;font-size:18px;font-weight:800;
+  letter-spacing:3px;color:var(--text);text-decoration:none;
+  display:inline-flex;align-items:center;gap:10px;
+}
+.logo span{color:var(--purple)}
+.logo-parent{font-size:12px;color:var(--muted);letter-spacing:1px;font-weight:400;margin-left:4px}
+.nav-links{display:flex;gap:28px;align-items:center}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:.2s}
+.nav-links a:hover{color:#fff}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;text-decoration:none;
+  border-radius:14px;padding:11px 20px;font-size:13px;font-weight:600;
+  transition:.3s;border:1px solid transparent;font-family:'Inter',sans-serif;
+}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#06111f;box-shadow:0 6px 24px var(--glow)}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-outline{color:var(--text);border-color:var(--border);background:rgba(255,255,255,0.03)}
+.btn-outline:hover{background:rgba(255,255,255,0.06)}
+#lang-switcher{display:flex;gap:3px;align-items:center}
+.lang-btn{background:transparent;border:1px solid transparent;color:var(--muted);font-size:11px;font-weight:500;padding:4px 7px;border-radius:6px;cursor:pointer;transition:.2s;letter-spacing:.5px;font-family:'Inter',sans-serif}
+.lang-btn:hover{color:#fff;border-color:var(--border)}
+.lang-btn.active{color:var(--purple);border-color:rgba(167,139,250,0.35);background:rgba(167,139,250,0.08)}
+
+/* HERO */
+.hero{padding:170px 0 100px;text-align:center}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  border:1px solid rgba(167,139,250,0.2);
+  padding:8px 18px;border-radius:999px;margin-bottom:32px;
+  color:var(--purple);font-size:12px;letter-spacing:.5px;
+  background:rgba(167,139,250,0.06);
+}
+h1{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(52px,7vw,96px);
+  line-height:1.0;letter-spacing:-4px;
+  margin-bottom:28px;
+}
+.grad-purple{
+  background:linear-gradient(135deg,#fff 0%,#a78bfa 45%,#6be3ff 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-sub{
+  font-size:20px;color:var(--muted);line-height:1.85;
+  max-width:660px;margin:0 auto 40px;
+}
+.hero-buttons{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* CANVAS */
+#aetherCanvas{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  pointer-events:none;z-index:0;opacity:0.22;
+}
+
+/* WHAT IS */
+.section{padding:100px 0}
+.section-label{
+  font-size:11px;letter-spacing:3px;color:var(--purple);
+  text-transform:uppercase;margin-bottom:20px;
+}
+.section h2{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(34px,4vw,56px);
+  line-height:1.1;letter-spacing:-2px;
+  margin-bottom:22px;
+}
+.section p{color:var(--muted);font-size:17px;line-height:1.9;max-width:760px}
+.section p+p{margin-top:16px}
+
+/* LAYERS */
+.layers{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:2px;
+  margin-top:60px;border-radius:24px;overflow:hidden;
+}
+.layer{
+  padding:38px 36px;
+  background:rgba(14,20,37,0.75);
+  border:1px solid rgba(255,255,255,0.06);
+  transition:.3s;position:relative;overflow:hidden;
+}
+.layer::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  opacity:0;transition:.3s;
+}
+.layer:hover{background:rgba(20,28,52,0.9)}
+.layer:hover::before{opacity:1}
+.layer.identity::before{background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.layer.runtime::before{background:linear-gradient(90deg,var(--purple),var(--cyan))}
+.layer.ecosystem::before{background:linear-gradient(90deg,var(--cyan),var(--blue))}
+.layer-tag{font-size:11px;letter-spacing:2px;margin-bottom:16px;text-transform:uppercase}
+.layer.identity .layer-tag{color:var(--blue)}
+.layer.runtime .layer-tag{color:var(--purple)}
+.layer.ecosystem .layer-tag{color:var(--cyan)}
+.layer h3{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:12px}
+.layer p{color:var(--muted);font-size:14px;line-height:1.8}
+.layer-icon{font-size:28px;margin-bottom:20px;opacity:0.8}
+
+/* WHAT AETHER DOES */
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:60px}
+.feature{
+  padding:32px;
+  background:rgba(14,20,37,0.6);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:20px;transition:.3s;
+}
+.feature:hover{border-color:rgba(167,139,250,0.2);background:rgba(167,139,250,0.04)}
+.feature-icon{
+  width:48px;height:48px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;margin-bottom:20px;
+  background:rgba(167,139,250,0.10);
+  border:1px solid rgba(167,139,250,0.15);
+}
+.feature h4{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:10px}
+.feature p{color:var(--muted);font-size:14px;line-height:1.8}
+
+/* QUOTE */
+.quote-band{
+  margin:80px 0;padding:56px 64px;
+  background:rgba(167,139,250,0.05);
+  border:1px solid rgba(167,139,250,0.12);
+  border-radius:28px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.quote-band::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(167,139,250,0.3),transparent);
+}
+.quote-band blockquote{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(22px,3vw,36px);
+  line-height:1.4;letter-spacing:-1px;
+  color:var(--text);font-weight:600;
+}
+.quote-band cite{
+  display:block;margin-top:20px;
+  font-size:13px;color:var(--muted);
+  font-style:normal;letter-spacing:.5px;
+}
+
+/* ARCHITECTURE */
+.arch-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:50px;
+  align-items:center;margin-top:60px;
+}
+.arch-visual{
+  height:420px;border-radius:24px;overflow:hidden;
+  background:rgba(12,18,36,1);border:1px solid rgba(255,255,255,0.06);
+  position:relative;
+}
+.arch-list{display:flex;flex-direction:column;gap:16px}
+.arch-item{
+  padding:22px 26px;border-radius:16px;
+  border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.02);transition:.3s;
+}
+.arch-item:hover{border-color:rgba(167,139,250,0.2)}
+.arch-item h4{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:8px}
+.arch-item p{color:var(--muted);font-size:13px;line-height:1.75}
+
+/* ORIGIN */
+.origin{
+  padding:80px;
+  background:rgba(14,20,37,0.7);
+  border:1px solid rgba(255,255,255,0.07);
+  border-radius:28px;
+  position:relative;overflow:hidden;
+}
+.origin::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(167,139,250,0.25),transparent);
+}
+.origin h2{font-family:'Syne',sans-serif;font-size:clamp(28px,3.5vw,46px);line-height:1.15;letter-spacing:-1.5px;margin-bottom:24px}
+.origin p{color:var(--muted);font-size:16px;line-height:1.9;max-width:700px}
+.origin p+p{margin-top:14px}
+
+/* CTA */
+.cta{padding:100px 0 140px;text-align:center}
+.cta h2{font-family:'Syne',sans-serif;font-size:clamp(36px,5vw,64px);letter-spacing:-2.5px;line-height:1.1;margin-bottom:20px}
+.cta p{color:var(--muted);font-size:17px;max-width:560px;margin:0 auto 36px;line-height:1.85}
+
+/* FOOTER */
+footer{border-top:1px solid rgba(255,255,255,0.06);padding:32px 0}
+.footer-inner{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+.footer-copy{color:var(--muted);font-size:13px}
+.footer-links{display:flex;gap:22px}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:13px;transition:.2s}
+.footer-links a:hover{color:#fff}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:900px){
+  .layers{grid-template-columns:1fr}
+  .arch-grid{grid-template-columns:1fr}
+  .arch-visual{height:300px}
+  .origin{padding:40px 28px}
+  .quote-band{padding:36px 28px}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<canvas id="aetherCanvas"></canvas>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <a class="logo" href="https://aether.rymory.org">
+      <svg width="28" height="16" viewBox="0 0 120 48" fill="none">
+        <path d="M8,24 C8,18 14,14 28,14 C55,14 85,16 100,24 C85,32 55,34 28,34 C14,34 8,30 8,24 Z" fill="#a78bfa"/>
+        <path d="M100,24 L118,10 L108,24 Z" fill="#6be3ff"/>
+        <path d="M100,24 L118,38 L108,24 Z" fill="#6be3ff"/>
+        <ellipse cx="22" cy="19" rx="12" ry="7" fill="#050816" stroke="#6be3ff" stroke-width="1.2"/>
+        <line x1="12" y1="17" x2="32" y2="17" stroke="#6be3ff" stroke-width="0.9" opacity="0.8"/>
+        <line x1="11" y1="19" x2="33" y2="19" stroke="#6be3ff" stroke-width="0.9"/>
+        <line x1="12" y1="21" x2="32" y2="21" stroke="#6be3ff" stroke-width="0.9" opacity="0.8"/>
+        <circle cx="36" cy="20" r="3" fill="#050816" stroke="#6be3ff" stroke-width="1"/>
+      </svg>
+      A<span>E</span>THER
+      <span class="logo-parent">by rymory</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#what" data-i18n="nav_what">What is Aether</a>
+      <a href="#architecture" data-i18n="nav_arch">Architecture</a>
+      <a href="#origin" data-i18n="nav_origin">Origin</a>
+      <a href="https://rymory.org" target="_blank" data-i18n="nav_rymory">Rymory →</a>
+    </nav>
+    <div id="lang-switcher" style="display:flex;gap:4px;margin-right:8px"></div>
+    <div style="display:flex;gap:12px">
+      <a class="btn btn-outline" href="https://github.com/lemoras/lemoras-ui" target="_blank" data-i18n="nav_github">GitHub</a>
+      <a class="btn btn-primary" href="https://rymory.org" target="_blank" data-i18n="nav_protocol">Rymory Protocol</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">
+      <span data-i18n="hero_eyebrow">◈ Ecosystem Runtime</span>
+    </div>
+    <h1><span class="grad-purple"><span data-i18n="hero_h1a">The medium</span><br><span data-i18n="hero_h1b">apps live in.</span></h1>
+    <p class="hero-sub"><span data-i18n="hero_sub">Aether is the web ecosystem runtime and application shell of the Rymory platform. It carries authentication, session orchestration, cross-app navigation and multi-tenant context — invisibly, across every application.</span></p>
+    <div class="hero-buttons">
+      <a class="btn btn-primary" href="https://github.com/lemoras/lemoras-ui" target="_blank"><span data-i18n="hero_btn1">Explore on GitHub</span></a>
+      <a class="btn btn-outline" href="#what"><span data-i18n="hero_btn2">What is Aether?</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="what">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label"><span data-i18n="what_label">What is Aether</span></div>
+      <h2><span data-i18n="what_h2a">Not a frontend.</span><br><span data-i18n="what_h2b">An environment.</span></h2>
+      <p><span data-i18n="what_p1">Most identity systems give you an auth endpoint. Aether gives applications a place to live.</span></p>
+      <p><span data-i18n="what_p2">You do not see Aether. You see the applications it carries.</span></p>
+    </div>
+
+    <div class="layers reveal">
+      <div class="layer identity">
+        <div class="layer-icon">◎</div>
+        <div class="layer-tag" data-i18n="layer1_tag">Rymory</div>
+        <h3 data-i18n="layer1_h">Identity Layer</h3>
+        <p data-i18n="layer1_p">JWT authentication, federation, role hierarchy, session tokens. The ground truth of who you are.</p>
+      </div>
+      <div class="layer runtime">
+        <div class="layer-icon">◈</div>
+        <div class="layer-tag" data-i18n="layer2_tag">Aether</div>
+        <h3 data-i18n="layer2_h">Runtime Layer</h3>
+        <p data-i18n="layer2_p">App orchestration, config-driven routing, SSO propagation, template engine, multi-tenant context. The medium everything runs in.</p>
+      </div>
+      <div class="layer ecosystem">
+        <div class="layer-icon">⬡</div>
+        <div class="layer-tag" data-i18n="layer3_tag">Lemoras</div>
+        <h3 data-i18n="layer3_h">Ecosystem Layer</h3>
+        <p data-i18n="layer3_p">Notes, Drive, Planner, Passwords — applications that live inside the runtime, authenticated by the identity layer.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="quote-band reveal">
+    <blockquote data-i18n="quote">"Aether is not the authority.<br>It is the environment."</blockquote>
+    <cite><span data-i18n="quote_cite">— Aether Runtime, design principle</span></cite>
+  </div>
+</div>
+
+<section class="section" id="features">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label"><span data-i18n="feat_label">What Aether carries</span></div>
+      <h2><span data-i18n="feat_h2a">Everything apps need.</span><br><span data-i18n="feat_h2b">Nothing they don't.</span></h2>
+    </div>
+    <div class="features">
+      <div class="feature reveal">
+        <div class="feature-icon">⌘</div>
+        <h4 data-i18n="feat1_h">Config-driven routing</h4>
+        <p data-i18n="feat1_p">Every application, route and navigation structure is defined in JSON config. Same runtime, infinite configurations.</p>
+      </div>
+      <div class="feature reveal" style="transition-delay:.08s">
+        <div class="feature-icon">◎</div>
+        <h4 data-i18n="feat2_h">SSO session propagation</h4>
+        <p data-i18n="feat2_p">Cross-domain login and logout flow built in. One session travels to every connected application automatically.</p>
+      </div>
+      <div class="feature reveal" style="transition-delay:.16s">
+        <div class="feature-icon">◈</div>
+        <h4 data-i18n="feat3_h">Multi-tenant context</h4>
+        <p data-i18n="feat3_p">appId, merchantId, projectId, roleId — carried in every request. Applications always know their tenant scope.</p>
+      </div>
+      <div class="feature reveal" style="transition-delay:.24s">
+        <div class="feature-icon">⬡</div>
+        <h4 data-i18n="feat4_h">Template engine</h4>
+        <p data-i18n="feat4_p">w_artfactory for public pages. w_default for authenticated panels. Swappable per-application, even per-user.</p>
+      </div>
+      <div class="feature reveal" style="transition-delay:.32s">
+        <div class="feature-icon">⌬</div>
+        <h4 data-i18n="feat5_h">Multi-language runtime</h4>
+        <p data-i18n="feat5_p">EN, TR, RU built in. Language detected from browser, stored in context, applied across every view.</p>
+      </div>
+      <div class="feature reveal" style="transition-delay:.40s">
+        <div class="feature-icon">◯</div>
+        <h4 data-i18n="feat6_h">Plugin-style app loading</h4>
+        <p data-i18n="feat6_p">Each app is an isolated module. Notes, Drive, Planner, Passwords — same shell, different configs. New apps drop in.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="architecture">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-label"><span data-i18n="arch_label">Architecture</span></div>
+      <h2><span data-i18n="arch_h2a">How Aether sits</span><br><span data-i18n="arch_h2b">in the stack.</span></h2>
+    </div>
+    <div class="arch-grid reveal">
+      <div class="arch-visual">
+        <svg width="100%" height="100%" viewBox="0 0 500 420">
+          <defs>
+            <radialGradient id="ag" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#a78bfa" stop-opacity=".12"/>
+              <stop offset="100%" stop-color="#a78bfa" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <rect width="500" height="420" fill="#050816"/>
+          <circle cx="250" cy="210" r="160" fill="url(#ag)"/>
+
+          <!-- Stack boxes -->
+          <rect x="80" y="40" width="340" height="60" rx="12" fill="#0c1a36" stroke="#67a8ff" stroke-width="1.5"/>
+          <text x="250" y="65" text-anchor="middle" fill="#67a8ff" font-family="Syne,sans-serif" font-size="12" font-weight="700" letter-spacing="2">RYMORY</text>
+          <text x="250" y="84" text-anchor="middle" fill="#8d9bb7" font-family="Inter,sans-serif" font-size="10" letter-spacing="1">IDENTITY · FEDERATION · JWT</text>
+
+          <rect x="60" y="130" width="380" height="80" rx="12" fill="#0d1530" stroke="#a78bfa" stroke-width="2"/>
+          <text x="250" y="162" text-anchor="middle" fill="#a78bfa" font-family="Syne,sans-serif" font-size="14" font-weight="800" letter-spacing="3">AETHER</text>
+          <text x="250" y="182" text-anchor="middle" fill="#8d9bb7" font-family="Inter,sans-serif" font-size="10" letter-spacing="1">RUNTIME · SHELL · ORCHESTRATION</text>
+
+          <!-- App boxes -->
+          <rect x="50" y="250" width="88" height="52" rx="10" fill="#0c1324" stroke="#6be3ff" stroke-width="1"/>
+          <text x="94" y="280" text-anchor="middle" fill="#fff" font-family="Inter,sans-serif" font-size="11">Notes</text>
+
+          <rect x="153" y="250" width="88" height="52" rx="10" fill="#0c1324" stroke="#6be3ff" stroke-width="1"/>
+          <text x="197" y="280" text-anchor="middle" fill="#fff" font-family="Inter,sans-serif" font-size="11">Drive</text>
+
+          <rect x="256" y="250" width="88" height="52" rx="10" fill="#0c1324" stroke="#6be3ff" stroke-width="1"/>
+          <text x="300" y="280" text-anchor="middle" fill="#fff" font-family="Inter,sans-serif" font-size="11">Planner</text>
+
+          <rect x="359" y="250" width="88" height="52" rx="10" fill="#0c1324" stroke="#6be3ff" stroke-width="1"/>
+          <text x="403" y="280" text-anchor="middle" fill="#fff" font-family="Inter,sans-serif" font-size="11">Passwords</text>
+
+          <!-- Connectors -->
+          <line x1="250" y1="100" x2="250" y2="130" stroke="#67a8ff" stroke-width="1.5" stroke-opacity=".5"/>
+          <line x1="94" y1="210" x2="94" y2="250" stroke="#a78bfa" stroke-width="1" stroke-opacity=".4"/>
+          <line x1="197" y1="210" x2="197" y2="250" stroke="#a78bfa" stroke-width="1" stroke-opacity=".4"/>
+          <line x1="300" y1="210" x2="300" y2="250" stroke="#a78bfa" stroke-width="1" stroke-opacity=".4"/>
+          <line x1="403" y1="210" x2="403" y2="250" stroke="#a78bfa" stroke-width="1" stroke-opacity=".4"/>
+
+          <!-- Lemoras label -->
+          <text x="250" y="370" text-anchor="middle" fill="#4a5a7a" font-family="Syne,sans-serif" font-size="11" letter-spacing="3">LEMORAS ECOSYSTEM</text>
+        </svg>
+      </div>
+      <div class="arch-list">
+        <div class="arch-item">
+          <h4 data-i18n="arch1_h">Rymory sits above</h4>
+          <p data-i18n="arch1_p">Authentication, JWT issuance and session validation are handled entirely by Rymory. Aether consumes the identity — it does not produce it.</p>
+        </div>
+        <div class="arch-item">
+          <h4 data-i18n="arch2_h">Aether carries the middle</h4>
+          <p data-i18n="arch2_p">Between identity and application lives the runtime. Config loading, route orchestration, SSO propagation, template selection — all Aether.</p>
+        </div>
+        <div class="arch-item">
+          <h4 data-i18n="arch3_h">Apps plug in below</h4>
+          <p data-i18n="arch3_p">Notes, Drive, Planner, Passwords — each app is a module. Same shell. Different config. New applications drop in without touching the runtime.</p>
+        </div>
+        <div class="arch-item">
+          <h4 data-i18n="arch4_h">Lemoras is the ecosystem</h4>
+          <p data-i18n="arch4_p">Lemoras is not a framework. It is a living ecosystem of applications built on top of Rymory identity and Aether runtime.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="origin">
+  <div class="container">
+    <div class="origin reveal">
+      <div class="section-label"><span data-i18n="origin_label">Origin</span></div>
+      <h2><span data-i18n="origin_h">Nine years of organic evolution.</span></h2>
+      <p data-i18n="origin_p1">Aether was not designed. It emerged. Starting in 2017 as the frontend layer of the Lemoras ecosystem, it accumulated patterns over years of real production use — config-driven routing, cross-domain SSO, multi-tenant context, plugin-style app loading.</p>
+      <p data-i18n="origin_p2">At some point, the infrastructure had clearly outgrown its label. This was no longer a "UI project". It was a runtime. An environment. A medium. The word "Aether" — the ancient concept of the invisible medium that carries everything — was the only name that fit.</p>
+      <p data-i18n="origin_p3">Aether is developed as an independent runtime project, while remaining the official runtime layer of the Rymory ecosystem.</p>
+      <div style="margin-top:36px;display:flex;gap:16px;flex-wrap:wrap">
+        <a class="btn btn-primary" href="https://github.com/lemoras/lemoras-ui" target="_blank" data-i18n="origin_btn1">View on GitHub</a>
+        <a class="btn btn-outline" href="https://rymory.org/remora.html" target="_blank" data-i18n="origin_btn2">Read the philosophy →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="container">
+    <h2><span data-i18n="cta_h2a">The medium</span><br><span class="grad-purple" data-i18n="cta_h2b">is now open.</span></h2>
+    <p><span data-i18n="cta_p">Aether is part of the Rymory open ecosystem. Build your own applications on top of it, fork it, extend it.</span></p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <a class="btn btn-primary" href="https://github.com/lemoras/lemoras-ui" target="_blank" data-i18n="cta_btn1">GitHub →</a>
+      <a class="btn btn-outline" href="https://rymory.org" target="_blank" data-i18n="cta_btn2">Back to Rymory</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <div class="footer-copy" data-i18n="footer_copy">© 2027 Aether Runtime — Part of the Rymory ecosystem · By Onur Yaşar</div>
+    <div class="footer-links">
+      <a href="https://rymory.org" target="_blank">Rymory</a>
+      <a href="https://lemoras.com" target="_blank">Lemoras</a>
+      <a href="https://github.com/lemoras/lemoras-ui" target="_blank">GitHub</a>
+      <a href="https://rymory.org/remora.html" target="_blank">Philosophy</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Aether canvas — flowing medium
+(function(){
+  const c=document.getElementById('aetherCanvas');
+  if(!c)return;
+  const ctx=c.getContext('2d');
+  let W,H,t=0;
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}
+  resize();window.addEventListener('resize',resize);
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    for(let s=0;s<10;s++){
+      const ph=s/10,amp=14+s*7,freq=0.005+s*0.0015,spd=0.35+s*0.04;
+      const cy=H*0.25+s*(H*0.055);
+      ctx.beginPath();
+      for(let i=0;i<W;i+=2){
+        const y=cy+Math.sin(i*freq+t*spd+ph*Math.PI*2)*amp
+                  +Math.sin(i*freq*1.7+t*spd*0.5+ph*Math.PI)*amp*0.25;
+        i===0?ctx.moveTo(i,y):ctx.lineTo(i,y);
+      }
+      const purple=s%3===0,dist=Math.abs(s-5)/5;
+      const col=purple?'167,139,250':'103,168,255';
+      ctx.strokeStyle=`rgba(${col},${(0.10+0.07*(1-dist)).toFixed(2)})`;
+      ctx.lineWidth=1;ctx.stroke();
+    }
+    t+=0.010;requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// Scroll reveal
+const obs=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting)el.target.classList.add('visible')})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// Nav scroll
+const nb=document.querySelector('.navbar');
+window.addEventListener('scroll',()=>{nb.style.background=window.scrollY>30?'rgba(5,8,22,0.92)':'rgba(5,8,22,0.55)'});
+</script>
+<script src="aether-i18n.js"></script>
+</body>
+</html>
